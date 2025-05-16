@@ -1,5 +1,5 @@
 import "package:flutter/material.dart";
-import 'package:healing_haven/loginsignup%20page/utils/mybutton.dart';
+import 'package:healing_haven/loginsignup page/utils/mybutton.dart';
 import 'package:intl/intl.dart';
 
 class SchedulingPage extends StatefulWidget {
@@ -14,25 +14,15 @@ class _SchedulingPageState extends State<SchedulingPage> {
   DateTime selectedDate = DateTime.now();
   String _selectedTime = '';
 
+  final _formKey = GlobalKey<FormState>();
+  final _fullNameController = TextEditingController();
+  final _ageController = TextEditingController();
+  final _descriptionController = TextEditingController();
+
   List<String> months = List.generate(
     12,
     (i) => DateFormat.MMMM().format(DateTime(0, i + 1)),
   );
-
-  List<DateTime> getDaysInMonth(DateTime month) {
-    final firstDay = DateTime(month.year, month.month, 1);
-    final lastDay = DateTime(month.year, month.month + 1, 0);
-    return List.generate(
-      lastDay.day,
-      (i) => DateTime(month.year, month.month, i + 1),
-    );
-  }
-
-  void _handleTimeSelected(String selectedTime) {
-    setState(() {
-      _selectedTime = selectedTime;
-    });
-  }
 
   List<String> availableTimes = [
     '10:00 AM',
@@ -55,6 +45,21 @@ class _SchedulingPageState extends State<SchedulingPage> {
     '7:00 PM',
   ];
 
+  List<DateTime> getDaysInMonth(DateTime month) {
+    final firstDay = DateTime(month.year, month.month, 1);
+    final lastDay = DateTime(month.year, month.month + 1, 0);
+    return List.generate(
+      lastDay.day,
+      (i) => DateTime(month.year, month.month, i + 1),
+    );
+  }
+
+  void _handleTimeSelected(String selectedTime) {
+    setState(() {
+      _selectedTime = selectedTime;
+    });
+  }
+
   void areyouSure(BuildContext context) {
     showDialog(
       context: context,
@@ -70,19 +75,13 @@ class _SchedulingPageState extends State<SchedulingPage> {
               style: TextStyle(fontSize: 16),
             ),
             actions: [
-              // Cancel button
               TextButton(
-                onPressed: () {
-                  Navigator.pop(context); // Close the dialog
-                },
+                onPressed: () => Navigator.pop(context),
                 child: Text('Cancel', style: TextStyle(color: Colors.grey)),
               ),
-              // Proceed button
               TextButton(
                 onPressed: () {
-                  // Handle confirmation action here
-                  Navigator.pop(context); // Close the dialog
-                  // You can perform further actions for confirmation
+                  Navigator.pop(context);
                   Navigator.pop(context);
                   Navigator.pushNamed(context, '/waitingpage');
                 },
@@ -119,7 +118,6 @@ class _SchedulingPageState extends State<SchedulingPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Month Picker
                       Padding(
                         padding: const EdgeInsets.only(
                           left: 16.0,
@@ -159,20 +157,14 @@ class _SchedulingPageState extends State<SchedulingPage> {
                               }).toList(),
                         ),
                       ),
-
-                      // Days Scroll
                       Container(
                         height: 80,
                         child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            // Left arrow
                             Padding(
                               padding: const EdgeInsets.only(left: 5.0),
                               child: Center(child: Icon(Icons.arrow_back_ios)),
                             ),
-
-                            // Scrollable days
                             Expanded(
                               child: ListView.builder(
                                 scrollDirection: Axis.horizontal,
@@ -182,7 +174,6 @@ class _SchedulingPageState extends State<SchedulingPage> {
                                   bool isSelected =
                                       day.day == selectedDate.day &&
                                       day.month == selectedDate.month;
-
                                   return GestureDetector(
                                     onTap:
                                         () =>
@@ -216,8 +207,6 @@ class _SchedulingPageState extends State<SchedulingPage> {
                                 },
                               ),
                             ),
-
-                            // Right arrow
                             Padding(
                               padding: const EdgeInsets.only(right: 5.0),
                               child: Center(
@@ -237,20 +226,16 @@ class _SchedulingPageState extends State<SchedulingPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12.0),
                 child: Wrap(
-                  spacing: 8, // less space between horizontal items
-                  runSpacing: 8, // less space between rows
+                  spacing: 8,
+                  runSpacing: 8,
                   children:
                       availableTimes.map((time) {
                         bool isSelected = _selectedTime == time;
                         return GestureDetector(
                           onTap: () => _handleTimeSelected(time),
                           child: Container(
-                            width:
-                                MediaQuery.of(context).size.width / 3 -
-                                16, // ~5 per row
-                            padding: EdgeInsets.symmetric(
-                              vertical: 8,
-                            ), // less vertical padding
+                            width: MediaQuery.of(context).size.width / 3 - 16,
+                            padding: EdgeInsets.symmetric(vertical: 8),
                             decoration: BoxDecoration(
                               color:
                                   isSelected
@@ -272,86 +257,118 @@ class _SchedulingPageState extends State<SchedulingPage> {
                       }).toList(),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 20,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Patient Details',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.brown.shade800,
-                      ),
-                    ),
-                    SizedBox(height: 10),
 
-                    // Full Name (auto-filled)
-                    TextField(
-                      decoration: InputDecoration(
-                        labelText: 'Full Name',
-                        hintText:
-                            'John Doe', // Replace with actual user name from account
-                        border: OutlineInputBorder(),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.brown.shade800,
-                            width: 2,
-                          ),
+              // Patient Details Form with Validation
+              Form(
+                key: _formKey,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 20,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Patient Details',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.brown.shade800,
                         ),
-                        filled: true,
-                        fillColor: Colors.grey[300],
                       ),
-                    ),
-                    SizedBox(height: 12),
+                      SizedBox(height: 10),
 
-                    // Age
-                    TextField(
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        labelText: 'Age',
-                        border: OutlineInputBorder(),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.brown.shade800,
-                            width: 2,
+                      // Full Name
+                      TextFormField(
+                        controller: _fullNameController,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Full Name is required.';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'Full Name',
+                          hintText: 'John Doe',
+                          border: OutlineInputBorder(),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.brown.shade800,
+                              width: 2,
+                            ),
                           ),
+                          filled: true,
+                          fillColor: Colors.grey[300],
                         ),
-                        filled: true,
-                        fillColor: Colors.grey[300],
                       ),
-                    ),
-                    SizedBox(height: 12),
+                      SizedBox(height: 12),
 
-                    // Reason for Appointment
-                    TextField(
-                      maxLines: 6,
-                      decoration: InputDecoration(
-                        labelText: 'Describe your problem',
-                        alignLabelWithHint: true,
-                        border: OutlineInputBorder(),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.brown.shade800,
-                            width: 2,
+                      // Age
+                      TextFormField(
+                        controller: _ageController,
+                        keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Age is required.';
+                          }
+                          final age = int.tryParse(value);
+                          if (age == null || age <= 0 || age > 120) {
+                            return 'Please enter a valid age.';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'Age',
+                          border: OutlineInputBorder(),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.brown.shade800,
+                              width: 2,
+                            ),
                           ),
+                          filled: true,
+                          fillColor: Colors.grey[300],
                         ),
-                        filled: true,
-                        fillColor: Colors.grey[300],
                       ),
-                    ),
-                  ],
+                      SizedBox(height: 12),
+
+                      // Description
+                      TextFormField(
+                        controller: _descriptionController,
+                        maxLines: 6,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Please describe your problem.';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'Describe your problem',
+                          alignLabelWithHint: true,
+                          border: OutlineInputBorder(),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.brown.shade800,
+                              width: 2,
+                            ),
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[300],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
+
               Padding(
                 padding: const EdgeInsets.only(bottom: 25.0),
                 child: Mybutton(
                   onTap: () {
-                    areyouSure(context);
+                    if (_formKey.currentState!.validate()) {
+                      areyouSure(context);
+                    }
                   },
                   buttonTxt: "Proceed",
                   color: Colors.brown.shade800,
