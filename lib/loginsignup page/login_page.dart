@@ -3,6 +3,7 @@ import 'package:healing_haven/loginsignup%20page/forgot_pass.dart';
 import 'package:healing_haven/loginsignup%20page/utils/my_text_field.dart';
 import 'package:healing_haven/loginsignup%20page/utils/mybutton.dart';
 import 'package:healing_haven/loginsignup%20page/utils/square_tile.dart';
+import 'package:healing_haven/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -29,10 +30,21 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   // Handle login logic
-  void _handleLogin() {
+  void _handleLogin() async {
     if (_formKey.currentState!.validate()) {
-      // If you want to add backend authentication, do it here
-      Navigator.pushReplacementNamed(context, '/homepageUser');
+      // Get the email and password from the controllers
+      String email = usernameController.text.trim();
+      String password = passwordController.text.trim();
+
+      try {
+        await authServ.value.signIn(email: email, password: password);
+        Navigator.pushReplacementNamed(context, '/homepageUser');
+      } catch (e) {
+        // Show an error message if login fails
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login failed: ${e.toString()}')),
+        );
+      }
     }
   }
 
@@ -170,13 +182,32 @@ class _LoginPageState extends State<LoginPage> {
 
                   const SizedBox(height: 30),
 
-                  // Social Logins
+                  // gmail Logins
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      SquareTile(Imagepath: 'lib/images/g.png'),
-                      SizedBox(width: 20),
-                      SquareTile(Imagepath: 'lib/images/f.png'),
+                    children: [
+                      GestureDetector(
+                        onTap: () async {
+                          try {
+                            await authServ.value.signInWithGoogle();
+                            Navigator.pushReplacementNamed(
+                              context,
+                              '/homepageUser',
+                            );
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Google sign-in failed: ${e.toString()}',
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                        child: const SquareTile(Imagepath: 'lib/images/g.png'),
+                      ),
+                      const SizedBox(width: 20),
+                      const SquareTile(Imagepath: 'lib/images/f.png'),
                     ],
                   ),
 

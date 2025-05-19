@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:healing_haven/auth_service.dart';
 
 class ChangePasswordPage extends StatefulWidget {
   const ChangePasswordPage({super.key});
@@ -25,7 +26,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            // Old Password Field
             TextField(
               controller: _oldPasswordController,
               obscureText: true,
@@ -39,17 +39,14 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                     width: 2,
                   ),
                 ),
-
                 hintText: 'Enter your old password',
                 prefixIcon: Icon(Icons.lock),
                 filled: true,
                 fillColor: Colors.grey[100],
               ),
             ),
-
             SizedBox(height: 16),
 
-            // New Password Field
             TextField(
               controller: _newPasswordController,
               obscureText: true,
@@ -63,7 +60,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                     width: 2,
                   ),
                 ),
-
                 hintText: 'Enter your new password',
                 prefixIcon: Icon(Icons.lock),
                 filled: true,
@@ -72,7 +68,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             ),
             SizedBox(height: 16),
 
-            // Confirm New Password Field
             TextField(
               controller: _confirmPasswordController,
               obscureText: true,
@@ -86,7 +81,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                     width: 2,
                   ),
                 ),
-
                 hintText: 'Re-enter your new password',
                 prefixIcon: Icon(Icons.lock),
                 filled: true,
@@ -97,47 +91,92 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
             // Change Password Button
             ElevatedButton(
-              onPressed: () {
-                // Handle password change logic here
+              onPressed: () async {
                 String oldPassword = _oldPasswordController.text;
                 String newPassword = _newPasswordController.text;
                 String confirmPassword = _confirmPasswordController.text;
 
                 if (newPassword == confirmPassword) {
-                  showDialog(
-                    context: context,
-                    builder:
-                        (context) => AlertDialog(
-                          backgroundColor: Colors.grey.shade200,
-                          title: Text(
-                            "Password Changed",
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          icon: Icon(
-                            Icons.check_circle_rounded,
-                            color: Colors.green,
-                            size: 100,
-                          ),
-                          actions: [
-                            // Cancel button
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context); // Close the dialog
-                              },
-                              child: Text(
-                                'Back',
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 16,
-                                ),
+                  try {
+                    await authServ.value.resetPasswordCurrentPassword(
+                      currentPassword: oldPassword,
+                      newPassword: newPassword,
+                      email: authServ.value.currentUser!.email!,
+                    );
+
+                    // Show success message if password is changed
+                    showDialog(
+                      context: context,
+                      builder:
+                          (context) => AlertDialog(
+                            backgroundColor: Colors.grey.shade200,
+                            title: Text(
+                              "Password Changed",
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ],
-                        ),
-                  );
+                            icon: Icon(
+                              Icons.check_circle_rounded,
+                              color: Colors.green,
+                              size: 100,
+                            ),
+                            actions: [
+                              // Close the dialog on button press
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context); // Close the dialog
+                                },
+                                child: Text(
+                                  'Back',
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                    );
+                  } catch (e) {
+                    // Show error message if password change fails
+                    showDialog(
+                      context: context,
+                      builder:
+                          (context) => AlertDialog(
+                            backgroundColor: Colors.grey.shade300,
+                            icon: Icon(
+                              Icons.cancel,
+                              size: 100,
+                              color: Colors.redAccent.shade700,
+                            ),
+                            content: Text(
+                              'Error: ${e.toString()}',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context); // Close the dialog
+                                },
+                                child: Text(
+                                  'OK',
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                    );
+                  }
                 } else {
                   // Show error if passwords don't match
                   showDialog(
@@ -162,7 +201,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                           actions: [
                             TextButton(
                               onPressed: () {
-                                Navigator.pop(context);
+                                Navigator.pop(context); // Close the dialog
                               },
                               child: Text(
                                 'OK',
@@ -189,7 +228,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 16,
-                ), // Text color
+                ),
               ),
             ),
           ],

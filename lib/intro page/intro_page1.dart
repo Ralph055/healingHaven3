@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:healing_haven/intro%20page/utils/blended_image.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class IntroPage3 extends StatelessWidget {
   final PageController controller;

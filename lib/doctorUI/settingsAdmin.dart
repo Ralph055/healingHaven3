@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:healing_haven/doctorUI/privacypolicy.dart';
-import 'package:healing_haven/intro%20page/onboarding_screen.dart';
 
 class SettingsAdmin extends StatelessWidget {
   const SettingsAdmin({super.key});

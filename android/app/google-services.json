@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "292002462997",
+    "project_id": "healinghaven-108d9",
+    "storage_bucket": "healinghaven-108d9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:292002462997:android:5ec9295a63c5a6e9c3bd1c",
+        "android_client_info": {
+          "package_name": "com.example.healing_haven"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCMdF_KBee1sVqJ-4wxpJCqMaL3bv32u-c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

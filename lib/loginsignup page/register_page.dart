@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:healing_haven/loginsignup%20page/utils/my_text_field.dart';
-import 'package:healing_haven/loginsignup%20page/utils/mybutton.dart';
+import 'package:healing_haven/loginsignup page/utils/my_text_field.dart';
+import 'package:healing_haven/loginsignup page/utils/mybutton.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -42,10 +42,14 @@ class _RegisterPageState extends State<RegisterPage> {
       // Prepare full phone number with +63 prefix
       String fullPhoneNumber = '+63' + numberController.text.trim();
 
-      // You can use fullPhoneNumber as needed here or pass it to next page
       print("Full Phone Number: $fullPhoneNumber");
+      print("Email: ${emailController.text.trim()}");
 
-      Navigator.pushNamed(context, '/registerpage2');
+      Navigator.pushNamed(
+        context,
+        '/registerpage2',
+        arguments: emailController.text.trim(),
+      );
     }
   }
 
@@ -156,7 +160,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         filled: true,
                         prefixText: '+63 ',
                         prefixStyle: const TextStyle(color: Colors.grey),
-                        counterText: '', // hides length counter
+                        counterText: '',
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.brown.shade200),
                         ),

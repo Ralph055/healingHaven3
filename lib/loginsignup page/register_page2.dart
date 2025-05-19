@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:healing_haven/loginsignup%20page/utils/my_text_field.dart';
-import 'package:healing_haven/loginsignup%20page/utils/mybutton.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:healing_haven/loginsignup page/utils/my_text_field.dart';
+import 'package:healing_haven/loginsignup page/utils/mybutton.dart';
+import '../auth_service.dart';
 
 class RegisterPage2 extends StatefulWidget {
   const RegisterPage2({super.key});
@@ -17,6 +19,16 @@ class _RegisterPage2State extends State<RegisterPage2> {
 
   final passwordController = TextEditingController();
   final confirmpasswordController = TextEditingController();
+
+  final Authserv _authService = Authserv();
+
+  String? email;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    email = ModalRoute.of(context)!.settings.arguments as String?;
+  }
 
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
@@ -47,15 +59,48 @@ class _RegisterPage2State extends State<RegisterPage2> {
     return null;
   }
 
-  void _handleCreateAccount() {
+  void _handleCreateAccount() async {
     if (_formKey.currentState!.validate()) {
-      // Password valid and matches
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        '/homepageUser',
-        (Route<dynamic> route) => false,
-      );
+      if (email == null) {
+        _showError("Email not found from previous step.");
+        return;
+      }
+
+      try {
+        await _authService.createAccount(
+          email: email!.trim(),
+          password: passwordController.text.trim(),
+        );
+
+        // Navigate to homepage on success
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/homepageUser',
+          (Route<dynamic> route) => false,
+        );
+      } on FirebaseAuthException catch (e) {
+        _showError(
+          e.message ?? "An error occurred while creating the account.",
+        );
+      }
     }
+  }
+
+  void _showError(String message) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text("Registration Error"),
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+    );
   }
 
   @override

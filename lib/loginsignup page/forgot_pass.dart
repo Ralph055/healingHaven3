@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:healing_haven/loginsignup%20page/utils/my_text_field.dart';
 import 'package:healing_haven/loginsignup%20page/utils/mybutton.dart';
+import 'package:healing_haven/auth_service.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   final VoidCallback? onBackToLogin;
@@ -31,26 +32,36 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     return null;
   }
 
-  void _sendResetLink() {
+  void _sendResetLink() async {
     if (_formKey.currentState!.validate()) {
-      showDialog(
-        context: context,
-        builder:
-            (context) => AlertDialog(
-              title: Text("Reset Link Sent"),
-              content: Text(
-                "Check your email for a link to reset your password.",
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text("OK", style: TextStyle(color: Colors.blue)),
+      String email = emailController.text.trim();
+
+      try {
+        await authServ.value.resetPassword(email: email);
+
+        showDialog(
+          context: context,
+          builder:
+              (context) => AlertDialog(
+                title: Text("Reset Link Sent"),
+                content: Text(
+                  "Check your email for a link to reset your password.",
                 ),
-              ],
-            ),
-      );
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text("OK", style: TextStyle(color: Colors.blue)),
+                  ),
+                ],
+              ),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+      }
     }
   }
 
