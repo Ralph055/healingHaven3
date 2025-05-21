@@ -25,12 +25,10 @@ class _RegisterPageState extends State<RegisterPage> {
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
     );
-    if (picked != null) {
-      setState(() {
-        dateController.text = picked.toString().split(" ")[0];
-      });
+    setState(() {
+      dateController.text = picked.toString().split(" ")[0];
+    });
     }
-  }
 
   bool _isValidEmail(String email) {
     final emailRegex = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");

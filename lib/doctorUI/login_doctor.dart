@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:healing_haven/loginsignup%20page/forgot_pass.dart';
-import 'package:healing_haven/loginsignup%20page/utils/my_text_field.dart';
-import 'package:healing_haven/loginsignup%20page/utils/mybutton.dart';
-import 'package:healing_haven/loginsignup%20page/utils/square_tile.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:healing_haven/loginsignup page/forgot_pass.dart';
+import 'package:healing_haven/loginsignup page/utils/my_text_field.dart';
+import 'package:healing_haven/loginsignup page/utils/mybutton.dart';
+import 'package:healing_haven/loginsignup page/utils/square_tile.dart';
+import 'package:healing_haven/auth_service.dart';
 
 class LoginPageDoctor extends StatefulWidget {
   const LoginPageDoctor({super.key});
@@ -48,13 +50,37 @@ class _LoginPageDoctorState extends State<LoginPageDoctor> {
     return null;
   }
 
-  void _handleLogin() {
+  void _handleLogin() async {
     if (_formKey.currentState!.validate()) {
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        '/doctorhomepage',
-        (Route<dynamic> route) => false,
-      );
+      final email = adminUsernameController.text.trim();
+      final password = adminPasswordController.text.trim();
+
+      try {
+        await authServ.value.signIn(email: email, password: password);
+
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/doctorhomepage',
+          (Route<dynamic> route) => false,
+        );
+      } on FirebaseAuthException catch (e) {
+        String errorMsg = 'An error occurred';
+        if (e.code == 'user-not-found') {
+          errorMsg = 'No user found for that email.';
+        } else if (e.code == 'wrong-password') {
+          errorMsg = 'Incorrect password.';
+        } else {
+          errorMsg = e.message ?? errorMsg;
+        }
+
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(errorMsg)));
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login failed. Try again later.')),
+        );
+      }
     }
   }
 
